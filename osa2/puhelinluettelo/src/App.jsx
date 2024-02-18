@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
-import axios from 'axios'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
@@ -11,7 +10,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
-  const [personsToShow, setPersonsToShow] = useState(persons)
+  const [personsToShow, setPersonsToShow] = useState([])
 
   useEffect(() => {
     personService
@@ -62,6 +61,17 @@ const App = () => {
     }
   }
 
+const removePerson = (id)  => {
+  const name = persons.filter(person => person.id === id)[0].name
+  if (window.confirm(`Delete ${name}?`)) {
+    personService
+    .remove(id)
+    const newPersons = persons.filter(p => p.id !== id)
+    setPersons(newPersons)
+    setPersonsToShow(newPersons)
+  } 
+}
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -75,7 +85,7 @@ const App = () => {
         handleNumberChange={handleNumberChange}
         />
       <h3>Numbers</h3>
-      <Persons personsToShow= {personsToShow}/>
+      <Persons personsToShow= {personsToShow} removePerson={removePerson}/>
     </div>
   )
 }
