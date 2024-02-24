@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
+import './index.css'
 import personService from './services/persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import Notification from './components/Notification'
 
 const App = () => {
 
@@ -11,6 +13,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
   const [personsToShow, setPersonsToShow] = useState([])
+  const [message, setMessage] = useState(null)
+  const [alert, setAlert] = useState(false)
 
   useEffect(() => {
     personService
@@ -37,6 +41,7 @@ const App = () => {
   }
 
   const addPerson = (event) => {
+    event.preventDefault()
     const alreadyAdded = persons.some(p => p.name === newName)
 
     const personObject = {
@@ -46,22 +51,38 @@ const App = () => {
 
     if(alreadyAdded){
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
-        const id = persons.find(p => p.name === newName).id
+        const personToUpdate = persons.find(p => p.name === newName)
+        const id = personToUpdate.id
+
         personService
         .update(id, personObject)
         .then(returnedPerson => {
-          const newPersons = persons.slice(0)
-          newPersons[id] = returnedPerson
+          const newPersons = persons.map(person => person.id !== id ? person : returnedPerson)
           setPersons(newPersons)
           setPersonsToShow(newPersons)
           setNewName('')
           setNewNumber('') 
-      })   
-    }
-  }
-    else {
-      event.preventDefault()
+        }) 
+        .catch(error => {
+          setMessage(`Information of '${newName}' has already been removed from server`)
+          setAlert(true)
+          setTimeout(() => {
+            setMessage(null)
+          }, 5000)
+          setPersons(persons.filter(p => p.id !== id))
+          setPersonsToShow(persons.filter(p => p.id !== id))
+          setNewName('')
+          setNewNumber('')
+        })
 
+        setMessage(`Updated ${newName}'s number`)
+        setAlert(false)
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000)
+     }
+    }
+    else {
       personService
         .create(personObject)
         .then(returnedPerson => {
@@ -71,8 +92,14 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
+
+      setMessage(`Added ${newName}`)
+      setAlert(false)
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
     }
-  }
+}
 
 const removePerson = (id)  => {
   const name = persons.filter(p => p.id === id)[0].name
@@ -82,12 +109,19 @@ const removePerson = (id)  => {
     const newPersons = persons.filter(p => p.id !== id)
     setPersons(newPersons)
     setPersonsToShow(newPersons)
+
+    setMessage(`Deleted ${name}`)
+    setAlert(false)
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
   } 
 }
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} alert={alert}/>
       <Filter filter={filter} handleFilterChange={handleFilterChange}/>
       <h3>add a new</h3>
       <PersonForm 
@@ -102,5 +136,4 @@ const removePerson = (id)  => {
     </div>
   )
 }
-
 export default App
