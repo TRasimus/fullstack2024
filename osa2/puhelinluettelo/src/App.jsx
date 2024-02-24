@@ -37,32 +37,45 @@ const App = () => {
   }
 
   const addPerson = (event) => {
-    const alreadyAdded = persons.some(e => e.name === newName)
+    const alreadyAdded = persons.some(p => p.name === newName)
+
+    const personObject = {
+      name: newName,
+      number: newNumber
+    }
 
     if(alreadyAdded){
-      alert(`${newName} is already added to phonebook`)
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        const id = persons.find(p => p.name === newName).id
+        personService
+        .update(id, personObject)
+        .then(returnedPerson => {
+          const newPersons = persons.slice(0)
+          newPersons[id] = returnedPerson
+          setPersons(newPersons)
+          setPersonsToShow(newPersons)
+          setNewName('')
+          setNewNumber('') 
+      })   
     }
+  }
     else {
       event.preventDefault()
-      const personObject = {
-        name: newName,
-        number: newNumber
-      }
 
-    personService
-      .create(personObject)
-      .then(returnedPerson => {
-        const newPersons = persons.concat(returnedPerson)
-        setPersons(newPersons)
-        setPersonsToShow(newPersons)
-        setNewName('')
-        setNewNumber('')
-      })
+      personService
+        .create(personObject)
+        .then(returnedPerson => {
+          const newPersons = persons.concat(returnedPerson)
+          setPersons(newPersons)
+          setPersonsToShow(newPersons)
+          setNewName('')
+          setNewNumber('')
+        })
     }
   }
 
 const removePerson = (id)  => {
-  const name = persons.filter(person => person.id === id)[0].name
+  const name = persons.filter(p => p.id === id)[0].name
   if (window.confirm(`Delete ${name}?`)) {
     personService
     .remove(id)
