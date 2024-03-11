@@ -1,6 +1,6 @@
 import CountryInfo from "./CountryInfo"
 
-const Countries = ({countriesToShow}) => {
+const Countries = ({countriesToShow, showCountry}) => {
 
     if (countriesToShow.length > 10 ) {
         return(
@@ -21,7 +21,9 @@ const Countries = ({countriesToShow}) => {
     return(
         <ul className='no-bullets'>
         {countriesToShow.map(country => 
-        <li key={country.name.common}>{country.name.common}</li>
+        <li key={country.name.common}>{country.name.common}
+        <button onClick= {() => showCountry(country.name.common)}>show</button>
+        </li>
         )}
         </ul>
     ) 

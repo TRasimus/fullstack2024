@@ -26,10 +26,15 @@ const App = () => {
     setCountriesToShow(filteredCoutries)
   }
 
+  const showCountry = (name) => {
+    const country = countries.filter(c => c.name.common === name)
+    setCountriesToShow(country)
+  }
+
   return (
     <div>
       <Filter filter={filter} handleFilterChange={handleFilterChange}/>
-      <Countries countriesToShow={countriesToShow} />
+      <Countries countriesToShow={countriesToShow} showCountry={showCountry} />
     </div>
   )
 }
