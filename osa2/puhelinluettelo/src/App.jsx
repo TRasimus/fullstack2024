@@ -62,17 +62,13 @@ const App = () => {
           setPersonsToShow(newPersons)
           setNewName('')
           setNewNumber('') 
-        }) 
+        })
         .catch(error => {
-          setMessage(`Information of '${newName}' has already been removed from server`)
-          setAlert(true)
-          setTimeout(() => {
-            setMessage(null)
-          }, 5000)
-          setPersons(persons.filter(p => p.id !== id))
-          setPersonsToShow(persons.filter(p => p.id !== id))
-          setNewName('')
-          setNewNumber('')
+          setMessage(`${error.response.data.error}`)
+            setAlert(true)
+            setTimeout(() => {
+              setMessage(null)
+            }, 5000)
         })
 
         setMessage(`Updated ${newName}'s number`)
@@ -82,6 +78,7 @@ const App = () => {
         }, 5000)
      }
     }
+
     else {
       personService
         .create(personObject)
@@ -91,6 +88,13 @@ const App = () => {
           setPersonsToShow(newPersons)
           setNewName('')
           setNewNumber('')
+        })
+        .catch(error => {
+          setAlert(true)
+          setMessage(`${error.response.data.error}`)
+          setTimeout(() => {
+            setMessage(null)
+          }, 5000)
         })
 
       setMessage(`Added ${newName}`)
