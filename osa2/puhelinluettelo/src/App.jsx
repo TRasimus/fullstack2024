@@ -88,7 +88,12 @@ const App = () => {
           setPersonsToShow(newPersons)
           setNewName('')
           setNewNumber('')
-        })
+          setMessage(`Added ${newName}`)
+          setAlert(false)
+          setTimeout(() => {
+            setMessage(null)
+          }, 5000)
+            })  
         .catch(error => {
           setAlert(true)
           setMessage(`${error.response.data.error}`)
@@ -96,12 +101,6 @@ const App = () => {
             setMessage(null)
           }, 5000)
         })
-
-      setMessage(`Added ${newName}`)
-      setAlert(false)
-      setTimeout(() => {
-        setMessage(null)
-      }, 5000)
     }
 }
 
